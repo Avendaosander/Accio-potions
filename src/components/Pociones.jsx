@@ -1,12 +1,24 @@
+import { useState } from 'react'
+import { FiEdit3 } from 'react-icons/fi'
+import { BsFillTrashFill } from 'react-icons/bs'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import Avatar from '@mui/material/Avatar'
-import { FiEdit3 } from 'react-icons/fi'
-import { BsFillTrashFill } from 'react-icons/bs'
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
+import Zoom from '@mui/material/Zoom'
+import ModalDelete from './ModalDelete'
 
-export default function Listofpotions({ pociones }) {
+export default function Listofpotions({ pociones, handleModalEdit }) {
+   const [potionID, setPotionID] = useState(false)
+   const [modalDelete, setModalDelete] = useState(false)
+   const handleModalDelete = (id = null) => {
+      setModalDelete(!modalDelete)
+      if (id !== null) setPotionID(id)
+   }
+
    return (
       <List className='w-full flex flex-col gap-5 py-0'>
          {pociones.map(pocion => (
@@ -43,14 +55,44 @@ export default function Listofpotions({ pociones }) {
                   primaryTypographyProps={{ fontWeight: '600' }}
                   primary={pocion.cantidad}
                />
-               <button className='font-medium col-end-12 flex justify-center'>
-                  <FiEdit3 className='text-3xl' />
-               </button>
-               <button className='font-medium col-end-13 flex justify-center'>
-                  <BsFillTrashFill className='text-3xl' />
-               </button>
+
+               <Tooltip
+                  title='Editar Pocion'
+                  TransitionComponent={Zoom}
+                  placement='bottom'
+               >
+                  <IconButton
+                     color='inherit'
+                     aria-label='add an alarm'
+                     className='font-medium col-end-12 flex justify-center'
+                     onClick={() => handleModalEdit(pocion)}
+                  >
+                     <FiEdit3 className='text-3xl' />
+                  </IconButton>
+               </Tooltip>
+               <Tooltip
+                  title='Editar Pocion'
+                  TransitionComponent={Zoom}
+                  placement='bottom'
+               >
+                  <IconButton
+                     color='inherit'
+                     aria-label='add an alarm'
+                     className='font-medium col-end-13 flex justify-center'
+                     onClick={() => handleModalDelete(pocion._id)}
+                  >
+                     <BsFillTrashFill className='text-3xl' />
+                  </IconButton>
+               </Tooltip>
             </ListItem>
          ))}
+
+         {modalDelete === true && (
+            <ModalDelete
+               handleModalDelete={handleModalDelete}
+               id={potionID}
+            />
+         )}
       </List>
    )
 }
@@ -59,10 +101,10 @@ export function NoPotions() {
    return <div>No hay pociones en el inventario</div>
 }
 
-export function Pociones({ pociones }) {
+export function Pociones({ pociones, handleModalEdit }) {
    const hasPotions = pociones.length > 0
    return hasPotions ? (
-      <Listofpotions pociones={pociones} />
+      <Listofpotions pociones={pociones} handleModalEdit={handleModalEdit}/>
    ) : (
       <NoPotions pociones={pociones} />
    )
