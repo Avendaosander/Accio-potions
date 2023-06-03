@@ -11,7 +11,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Zoom from '@mui/material/Zoom'
 import ModalDelete from './ModalDelete'
 
-export default function Listofpotions({ pociones, handleModalEdit }) {
+export default function Listofpotions({ handlePotions, pociones, handleModalEdit }) {
    const [potionID, setPotionID] = useState(false)
    const [modalDelete, setModalDelete] = useState(false)
    const handleModalDelete = (id = null) => {
@@ -89,6 +89,7 @@ export default function Listofpotions({ pociones, handleModalEdit }) {
 
          {modalDelete === true && (
             <ModalDelete
+               handlePotions={handlePotions}
                handleModalDelete={handleModalDelete}
                id={potionID}
             />
@@ -101,10 +102,10 @@ export function NoPotions() {
    return <div>No hay pociones en el inventario</div>
 }
 
-export function Pociones({ pociones, handleModalEdit }) {
+export function Pociones({ handlePotions, pociones, handleModalEdit }) {
    const hasPotions = pociones.length > 0
    return hasPotions ? (
-      <Listofpotions pociones={pociones} handleModalEdit={handleModalEdit}/>
+      <Listofpotions handlePotions={handlePotions} pociones={pociones} handleModalEdit={handleModalEdit}/>
    ) : (
       <NoPotions pociones={pociones} />
    )
