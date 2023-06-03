@@ -4,10 +4,10 @@ import OutlinedInput from '@mui/material/OutlinedInput'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import Chip from '@mui/material/Chip'
-import CancelIcon from '@mui/icons-material/Cancel';
+import CancelIcon from '@mui/icons-material/Cancel'
 import { useState } from 'react'
 import imagenDefault from '../assets/Sueño.webp'
-import { VscAdd  } from 'react-icons/vsc'
+import { VscAdd } from 'react-icons/vsc'
 import crearPocion from '../services/postCrear'
 
 const ITEM_HEIGHT = 48
@@ -16,7 +16,7 @@ const MenuProps = {
    PaperProps: {
       style: {
          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-         width: 250,
+         width: 250
       }
    }
 }
@@ -30,30 +30,26 @@ function getStyles(name, personName, theme) {
    }
 }
 
-function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
+function FormCreate({ handlePotions, handleModalCreate, ingredientes }) {
    const theme = useTheme()
    const [formulario, setFormulario] = useState({
       imagen: null,
       nombre: '',
       descripcion: '',
-      precio: 0,
-      cantidad: 0,
+      precio: 1,
+      cantidad: 1,
       categoria: '',
       ingredientes: []
    })
-   const [ingre, setIngre] = useState([])
    const [preview, setPreview] = useState(imagenDefault)
 
    const handleDelete = (e, value) => {
       e.preventDefault()
-      setIngre(ingre.filter(name => name !== value))
-   }
-
-   const handleChangeIngre = e => {
-      const ingredienteNuevo = e.target.value
-      // console.log(ingredienteNuevo)
-      setIngre(ingredienteNuevo)
-      handleChange(e)
+      const ingreNew = formulario.ingredientes.filter(name => name !== value)
+      setFormulario({
+         ...formulario,
+         ingredientes: ingreNew
+      })
    }
 
    const handleFile = e => {
@@ -66,10 +62,7 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
       setPreview(URL.createObjectURL(selectFile))
    }
 
-   // const classOption = `bg-[url(${imagenDefault1})]`
-
    const handleChange = e => {
-      // console.log(e.target)
       setFormulario({
          ...formulario,
          [e.target.name]: e.target.value
@@ -78,24 +71,62 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
 
    const handleSubmit = async e => {
       e.preventDefault()
-      // console.log(formulario)
-      
+
+      // Realizar las validaciones de los campos
+      if (formulario.imagen !== null) {
+         const allowedFormats = ['.png', '.jpg', '.jpeg', '.webp', '.svg']
+         const fileExtension = formulario.imagen.name
+            .substr(formulario.imagen.name.lastIndexOf('.'))
+            .toLowerCase()
+
+         if (!allowedFormats.includes(fileExtension)) {
+            console.log(
+               'Error: El campo "imagen" debe tener uno de los formatos permitidos: ' +
+                  allowedFormats.join(', ')
+            )
+            return
+         }
+      } else {
+         console.log('Error: Debe seleccionar una imagen.')
+         return
+      }
+
+      if (formulario.nombre.trim() === '') {
+         console.log('Error: El campo "nombre" no puede estar vacío.')
+         return
+      }
+
+      if (formulario.descripcion.trim() === '') {
+         console.log('Error: El campo "descripcion" no puede estar vacío.')
+         return
+      }
+
+      if (formulario.categoria.trim() === '') {
+         console.log('Error: El campo "categoria" no puede estar vacío.')
+         return
+      }
+
+      if (formulario.ingredientes.length === 0) {
+         console.log('Error: El campo "ingredientes" no puede estar vacío.')
+         return
+      }
+
       let body = new FormData()
-      formulario.imagen !== null && (body.append('imagen', formulario.imagen))
-      formulario.nombre !== '' && (body.append('nombre', formulario.nombre))
-      formulario.descripcion !== '' && (body.append('descripcion', formulario.descripcion))
-      formulario.precio !== '' && (body.append('precio', formulario.precio))
-      formulario.cantidad !== '' && (body.append('cantidad', formulario.cantidad))
-      formulario.categoria !== '' && (body.append('categoria', formulario.categoria))
-      formulario.ingredientes !== '' && (body.append('ingredientes', formulario.ingredientes))
+      formulario.imagen !== null && body.append('imagen', formulario.imagen)
+      formulario.nombre !== '' && body.append('nombre', formulario.nombre)
+      formulario.descripcion !== '' && body.append('descripcion', formulario.descripcion)
+      formulario.precio !== 0 && body.append('precio', formulario.precio)
+      formulario.cantidad !== 0 && body.append('cantidad', formulario.cantidad)
+      formulario.categoria !== '' && body.append('categoria', formulario.categoria)
+      formulario.ingredientes !== [] && body.append('ingredientes', formulario.ingredientes)
 
       const res = await crearPocion(body)
       if (res.messageError) return console.error(res.messageError)
-      handleModalCreate() 
+      handleModalCreate()
       handlePotions(res, 'agregar')
    }
 
-   const closeModal = (e) => {
+   const closeModal = e => {
       e.preventDefault()
       handleModalCreate()
    }
@@ -121,6 +152,7 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
                   id='imagen'
                   name='imagen'
                   className='hidden'
+                  accept='.png, .jpg, .jpeg, .webp, .svg'
                   onChange={handleFile}
                />
                <img
@@ -170,6 +202,7 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
                   className='col-span-3 row-span-1 rounded-xl px-5 py-2 outline-none focus:ring focus:ring-purple-600'
                   type='number'
                   name='precio'
+                  min={1}
                   id='precio'
                   placeholder='Precio'
                   value={formulario.precio}
@@ -185,6 +218,7 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
                   className='col-span-3 row-span-1 rounded-xl px-5 py-2 outline-none focus:ring focus:ring-purple-600'
                   type='number'
                   name='cantidad'
+                  min={1}
                   id='cantidad'
                   placeholder='Cantidad'
                   value={formulario.cantidad}
@@ -205,14 +239,19 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
                   onChange={e => handleChange(e)}
                ></textarea>
             </div>
-            <label id="demo-multiple-chip-label" className='font-semibold text-xl col-span-6 row-span-1'>Ingredientes</label>
+            <label
+               id='demo-multiple-chip-label'
+               className='font-semibold text-xl col-span-6 row-span-1'
+            >
+               Ingredientes
+            </label>
             <Select
                labelId='demo-multiple-chip-label'
                id='demo-multiple-chip'
                name='ingredientes'
                multiple
-               value={ingre}
-               onChange={handleChangeIngre}
+               value={formulario.ingredientes}
+               onChange={handleChange}
                className='col-span-full row-span-2 rounded-xl px-5 py-2 outline-none focus:ring focus:ring-purple-600 max-h-[10rem]'
                input={
                   <OutlinedInput
@@ -222,7 +261,14 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
                   />
                }
                renderValue={selected => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', maxWidth: '300', gap: 0.5 }}>
+                  <Box
+                     sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        maxWidth: '300',
+                        gap: 0.5
+                     }}
+                  >
                      {selected.map(value => (
                         <Chip
                            key={value}
@@ -230,7 +276,9 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
                            color='secondary'
                            variant='outlined'
                            deleteIcon={
-                              <CancelIcon onMouseDown={e => e.stopPropagation()}/>
+                              <CancelIcon
+                                 onMouseDown={e => e.stopPropagation()}
+                              />
                            }
                            onDelete={e => handleDelete(e, value)}
                         />
@@ -243,7 +291,11 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes}) {
                   <MenuItem
                      key={ingredient._id}
                      value={ingredient.nombre}
-                     style={getStyles(ingredient.nombre, ingre, theme)}
+                     style={getStyles(
+                        ingredient.nombre,
+                        formulario.ingredientes,
+                        theme
+                     )}
                   >
                      {ingredient.nombre}
                   </MenuItem>

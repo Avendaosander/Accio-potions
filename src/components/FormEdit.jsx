@@ -4,9 +4,9 @@ import OutlinedInput from '@mui/material/OutlinedInput'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import Chip from '@mui/material/Chip'
-import CancelIcon from '@mui/icons-material/Cancel';
+import CancelIcon from '@mui/icons-material/Cancel'
 import { useState } from 'react'
-import { VscAdd  } from 'react-icons/vsc'
+import { VscAdd } from 'react-icons/vsc'
 import editarPocion from '../services/putEditar'
 
 const ITEM_HEIGHT = 48
@@ -15,7 +15,7 @@ const MenuProps = {
    PaperProps: {
       style: {
          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-         width: 250,
+         width: 250
       }
    }
 }
@@ -29,22 +29,18 @@ function getStyles(name, personName, theme) {
    }
 }
 
-function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion}) {
+function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion }) {
    const theme = useTheme()
    const [formulario, setFormulario] = useState(pocion)
-   const [ingre, setIngre] = useState(pocion.ingredientes)
    const [preview, setPreview] = useState(pocion.imagen.secure_url)
 
    const handleDelete = (e, value) => {
       e.preventDefault()
-      setIngre(ingre.filter(name => name !== value))
-   }
-
-   const handleChangeIngre = e => {
-      const ingredienteNuevo = e.target.value
-      // console.log(ingredienteNuevo)
-      setIngre(ingredienteNuevo)
-      handleChange(e)
+      const ingreNew = formulario.ingredientes.filter(name => name !== value)
+      setFormulario({
+         ...formulario,
+         ingredientes: ingreNew
+      })
    }
 
    const handleFile = e => {
@@ -69,25 +65,65 @@ function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion}) {
 
    const handleSubmit = async e => {
       e.preventDefault()
-      // console.log(formulario)
-      
+
+      // Realizar las validaciones de los campos
+      if (
+         formulario.imagen !== null &&
+         formulario.imagen.secure_url === undefined
+      ) {
+         const allowedFormats = ['.png', '.jpg', '.jpeg', '.webp', '.svg']
+         const fileExtension = formulario.imagen.name
+            .substr(formulario.imagen.name.lastIndexOf('.'))
+            .toLowerCase()
+
+         if (!allowedFormats.includes(fileExtension)) {
+            console.log(
+               'Error: El campo "imagen" debe tener uno de los formatos permitidos: ' +
+                  allowedFormats.join(', ')
+            )
+            return
+         }
+      } else if (formulario.imagen === null) {
+         console.log('Error: Debe seleccionar una imagen.')
+         return
+      }
+
+      if (formulario.nombre.trim() === '') {
+         console.log('Error: El campo "nombre" no puede estar vacío.')
+         return
+      }
+
+      if (formulario.descripcion.trim() === '') {
+         console.log('Error: El campo "descripcion" no puede estar vacío.')
+         return
+      }
+
+      if (formulario.categoria.trim() === '') {
+         console.log('Error: El campo "categoria" no puede estar vacío.')
+         return
+      }
+
+      if (formulario.ingredientes.length === 0) {
+         console.log('Error: El campo "ingredientes" no puede estar vacío.')
+         return
+      }
+
       let body = new FormData()
-      formulario.imagen !== pocion.imagen && (body.append('imagen', formulario.imagen))
-      formulario.nombre !== pocion.nombre && (body.append('nombre', formulario.nombre))
-      formulario.descripcion !== pocion.descripcion && (body.append('descripcion', formulario.descripcion))
-      formulario.precio !== pocion.precio && (body.append('precio', formulario.precio))
-      formulario.cantidad !== pocion.cantidad && (body.append('cantidad', formulario.cantidad))
-      formulario.categoria !== pocion.categoria && (body.append('categoria', formulario.categoria))
-      formulario.ingredientes !== pocion.ingredientes && (body.append('ingredientes', formulario.ingredientes))
+      formulario.imagen !== pocion.imagen && body.append('imagen', formulario.imagen)
+      formulario.nombre !== pocion.nombre && body.append('nombre', formulario.nombre)
+      formulario.descripcion !== pocion.descripcion && body.append('descripcion', formulario.descripcion)
+      formulario.precio !== pocion.precio && body.append('precio', formulario.precio)
+      formulario.cantidad !== pocion.cantidad && body.append('cantidad', formulario.cantidad)
+      formulario.categoria !== pocion.categoria && body.append('categoria', formulario.categoria)
+      formulario.ingredientes !== pocion.ingredientes && body.append('ingredientes', formulario.ingredientes)
 
       const res = await editarPocion(body, pocion._id)
-      console.log(res)
       if (res.messageError) return console.error(res.messageError)
-      handleModalEdit() 
+      handleModalEdit()
       handlePotions(res, 'editar')
    }
 
-   const closeModal = (e) => {
+   const closeModal = e => {
       e.preventDefault()
       // setFormulario({})
       handleModalEdit()
@@ -114,6 +150,7 @@ function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion}) {
                   id='imagen'
                   name='imagen'
                   className='hidden'
+                  accept='.png, .jpg, .jpeg, .webp, .svg'
                   onChange={handleFile}
                />
                <img
@@ -163,6 +200,7 @@ function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion}) {
                   className='col-span-3 row-span-1 rounded-xl px-5 py-2 outline-none focus:ring focus:ring-purple-600'
                   type='number'
                   name='precio'
+                  min={1}
                   id='precio'
                   placeholder='Precio'
                   value={formulario.precio}
@@ -178,6 +216,7 @@ function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion}) {
                   className='col-span-3 row-span-1 rounded-xl px-5 py-2 outline-none focus:ring focus:ring-purple-600'
                   type='number'
                   name='cantidad'
+                  min={1}
                   id='cantidad'
                   placeholder='Cantidad'
                   value={formulario.cantidad}
@@ -198,14 +237,19 @@ function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion}) {
                   onChange={e => handleChange(e)}
                ></textarea>
             </div>
-            <label id="demo-multiple-chip-label" className='font-semibold text-xl col-span-6 row-span-1'>Ingredientes</label>
+            <label
+               id='demo-multiple-chip-label'
+               className='font-semibold text-xl col-span-6 row-span-1'
+            >
+               Ingredientes
+            </label>
             <Select
                labelId='demo-multiple-chip-label'
                id='demo-multiple-chip'
                name='ingredientes'
                multiple
-               value={ingre}
-               onChange={handleChangeIngre}
+               value={formulario.ingredientes}
+               onChange={handleChange}
                className='col-span-full row-span-2 rounded-xl px-5 py-2 outline-none focus:ring focus:ring-purple-600 max-h-[10rem]'
                input={
                   <OutlinedInput
@@ -215,7 +259,14 @@ function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion}) {
                   />
                }
                renderValue={selected => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', maxWidth: '300', gap: 0.5 }}>
+                  <Box
+                     sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        maxWidth: '300',
+                        gap: 0.5
+                     }}
+                  >
                      {selected.map(value => (
                         <Chip
                            key={value}
@@ -223,7 +274,9 @@ function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion}) {
                            color='secondary'
                            variant='outlined'
                            deleteIcon={
-                              <CancelIcon onMouseDown={e => e.stopPropagation()}/>
+                              <CancelIcon
+                                 onMouseDown={e => e.stopPropagation()}
+                              />
                            }
                            onDelete={e => handleDelete(e, value)}
                         />
@@ -236,7 +289,7 @@ function FormEdit({ handlePotions, handleModalEdit, ingredientes, pocion}) {
                   <MenuItem
                      key={ingredient._id}
                      value={ingredient.nombre}
-                     style={getStyles(ingredient.nombre, ingre, theme)}
+                     style={getStyles(ingredient.nombre, formulario.ingredientes, theme)}
                   >
                      {ingredient.nombre}
                   </MenuItem>
