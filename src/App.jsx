@@ -12,6 +12,7 @@ import useIngredients from './hooks/useIngredients'
 import { GiCauldron } from 'react-icons/gi'
 import Tooltip from '@mui/material/Tooltip'
 import Zoom from '@mui/material/Zoom'
+import TransitionAlerts from './components/Alerts'
 
 function App() {
    const { ingredientes, setIngredientes, loadingIng } = useIngredients()
@@ -19,6 +20,8 @@ function App() {
    const [modalCreate, setModalCreate] = useState(false)
    const [modalEdit, setModalEdit] = useState(false)
    const [pocionUpdate, setPocionUpdate] = useState(null)
+   const [alerta, setAlerta] = useState(false)
+   const [alertaObj, setAlertaObj] = useState(false)
 
    const handlePotions = (res, accion) => {
       const pocion = res.potion
@@ -49,6 +52,13 @@ function App() {
    const handleModalEdit = (pocion = null) => {
       setModalEdit(!modalEdit)
       if (pocion !== null) setPocionUpdate(pocion)
+   }
+   
+   const handleAlert = (state) => {
+      setAlerta(state)
+      setTimeout(() => {
+         setAlerta(false)
+      }, 3000);
    }
 
    return (
@@ -96,18 +106,28 @@ function App() {
 
             {modalCreate === true && (
                <ModalCreate
+                  handleAlert={handleAlert}
                   handlePotions={handlePotions}
                   handleModalCreate={handleModalCreate}
                   ingredientes={ingredientes}
+                  setAlertaObj={setAlertaObj}
                />
             )}
             {modalEdit === true && (
                <ModalEditar
+                  handleAlert={handleAlert}
                   handlePotions={handlePotions}
                   handleModalEdit={handleModalEdit}
                   ingredientes={ingredientes}
                   pocion={pocionUpdate}
+                  setAlertaObj={setAlertaObj}
                />
+            )}
+
+            {alerta && (
+               <div className='fixed top-5 flex justify-center z-10 transition ease-in-out duration-[3000ms]'>
+                  <TransitionAlerts alertaObj={alertaObj} handleAlert={handleAlert}/>
+               </div>
             )}
 
          </main>

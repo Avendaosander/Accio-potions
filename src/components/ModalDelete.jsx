@@ -1,10 +1,24 @@
 import Button from '@mui/material/Button';
 import deletePotion from '../services/deletePotion';
 
-function ModalDelete({ handlePotions, handleModalDelete, id }) {
+function ModalDelete({ handleAlert, handlePotions, handleModalDelete, id, setAlertaObj }) {
    const confirmDelete = async () => {
       const res = await deletePotion(id)
-      if (res.messageError) return console.error(res.messageError)
+      if (res.messageError) {
+         handleAlert(true) 
+         setAlertaObj({
+            message: res.messageError,
+            colorMui: 'error',
+            variante: 'filled'
+         })
+         return
+      }
+      handleAlert(true) 
+      setAlertaObj({
+         message: 'La pocion ha sido eliminada',
+         colorMui: 'success',
+         variante: 'filled'
+      })
       handleModalDelete() 
       handlePotions(res, 'eliminar')
    }

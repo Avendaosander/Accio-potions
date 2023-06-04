@@ -4,13 +4,24 @@ import { BsFillTrashFill } from 'react-icons/bs'
 import Tooltip from '@mui/material/Tooltip'
 import Zoom from '@mui/material/Zoom'
 import ModalDelete from './ModalDelete'
+import TransitionAlerts from './Alerts'
 
 export default function Listofpotions({ handlePotions, pociones, handleModalEdit }) {
    const [potionID, setPotionID] = useState(false)
    const [modalDelete, setModalDelete] = useState(false)
+   const [alerta, setAlerta] = useState(false)
+   const [alertaObj, setAlertaObj] = useState(false)
+
    const handleModalDelete = (id = null) => {
       setModalDelete(!modalDelete)
       if (id !== null) setPotionID(id)
+   }
+
+   const handleAlert = (state) => {
+      setAlerta(state)
+      setTimeout(() => {
+         setAlerta(false)
+      }, 2000);
    }
 
    return (
@@ -49,7 +60,7 @@ export default function Listofpotions({ handlePotions, pociones, handleModalEdit
                   </p>
                </Tooltip>
                <Tooltip
-                  title='Editar Pocion'
+                  title='Eliminar Pocion'
                   TransitionComponent={Zoom}
                   placement='bottom'
                >
@@ -67,10 +78,17 @@ export default function Listofpotions({ handlePotions, pociones, handleModalEdit
 
          {modalDelete === true && (
             <ModalDelete
+               handleAlert={handleAlert}
                handlePotions={handlePotions}
                handleModalDelete={handleModalDelete}
                id={potionID}
+               setAlertaObj={setAlertaObj}
             />
+         )}
+         {alerta && (
+            <div className='fixed top-5 flex justify-center z-10 transition ease-in-out duration-[3000ms]'>
+               <TransitionAlerts alertaObj={alertaObj} handleAlert={handleAlert}/>
+            </div>
          )}
       </ul>
    )
