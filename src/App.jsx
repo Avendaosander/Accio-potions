@@ -61,7 +61,7 @@ function App() {
             <section className='mb-5'>
                <SearchBar handleSearch={handleSearch} />
             </section>
-            <section className='flex justify-center w-full container mx-auto pb-20 gap-10'>
+            <section className='flex justify-evenly flex-col sm:flex-row container mx-auto pb-20 gap-10'>
                <article>
                   {loadingIng ? (
                      <LoaderIng />

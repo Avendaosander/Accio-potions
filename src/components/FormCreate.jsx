@@ -143,7 +143,7 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes }) {
             <div className='relative m-auto mt-2 col-span-6 row-span-1 gap-5 items-center py-0'>
                <label
                   htmlFor='imagen'
-                  className='cursor-pointer flex justify-center items-center bg-fuchsia-900 rounded-full w-10 h-10 absolute -right-[1rem] top-36'
+                  className='cursor-pointer flex justify-center items-center bg-fuchsia-900 rounded-full w-10 h-10 absolute -right-[1rem] top-16 sm:top-28 md:top-36'
                >
                   <VscAdd className='text-purple-200 relative text-xl m-1' />
                </label>
@@ -158,7 +158,7 @@ function FormCreate({ handlePotions, handleModalCreate, ingredientes }) {
                <img
                   src={preview}
                   alt='Imagen de la Pocion'
-                  className='w-[20rem] h-[20rem] object-cover ring-2 ring-purple-500/20 m-auto rounded-full'
+                  className='w-[10rem] h-[10rem] sm:w-[15rem] sm:h-[15rem] md:w-[20rem] md:h-[20rem] object-cover ring-2 ring-purple-500/20 m-auto rounded-full'
                />
             </div>
             <div className='col-span-6 row-span-11 grid grid-cols-6 grid-rows-11 items-center gap-5 text-purple-950'>

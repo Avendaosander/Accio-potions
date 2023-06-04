@@ -1,12 +1,6 @@
 import { useState } from 'react'
 import { FiEdit3 } from 'react-icons/fi'
 import { BsFillTrashFill } from 'react-icons/bs'
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemText from '@mui/material/ListItemText'
-import ListItemAvatar from '@mui/material/ListItemAvatar'
-import Avatar from '@mui/material/Avatar'
-import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import Zoom from '@mui/material/Zoom'
 import ModalDelete from './ModalDelete'
@@ -20,71 +14,55 @@ export default function Listofpotions({ handlePotions, pociones, handleModalEdit
    }
 
    return (
-      <List className='w-full flex flex-col gap-5 py-0'>
+      <ul className='lg:flex lg:flex-col gap-5 py-0 grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] justify-center'>
          {pociones.map(pocion => (
-            <ListItem
+            <li
                key={pocion._id}
-               className='grid grid-cols-12 gap-2 text-purple-950 bg-purple-900/50 py-5 px-5 rounded-xl shadow-purple-800/50 shadow-lg items-center text-center'
+               className='grid grid-cols-2 max-lg:grid-flow-row max-lg:auto-rows-auto lg:grid-cols-12 gap-3 text-purple-950 bg-purple-900/50 py-5 px-5 rounded-xl shadow-purple-800/50 shadow-lg items-center text-center w-11/12 sm:w-auto mx-auto sm:mx-0'
             >
-               <ListItemAvatar className='col-span-1'>
-                  <Avatar className='w-16 h-16'>
-                     <img
-                        src={pocion.imagen.secure_url}
-                        alt={pocion.nombre}
-                        className='object-cover w-16 h-16 rounded-full'
-                     />
-                  </Avatar>
-               </ListItemAvatar>
-               <ListItemText
-                  className='col-span-2'
-                  primaryTypographyProps={{ fontSize: 20, fontWeight: '700' }}
-                  primary={pocion.nombre}
-               />
-               <ListItemText
-                  className='col-span-5'
-                  primaryTypographyProps={{ fontSize: 15, fontWeight: '600' }}
-                  primary={pocion.descripcion}
-               />
-               <ListItemText
-                  className='col-span-1'
-                  primaryTypographyProps={{ fontWeight: '600' }}
-                  primary={`${pocion.precio}$`}
-               />
-               <ListItemText
-                  className='font-medium col-col-end-11'
-                  primaryTypographyProps={{ fontWeight: '600' }}
-                  primary={pocion.cantidad}
-               />
+               <div className='col-span-2 max-lg:row-start-1 lg:col-span-1 w-28 lg:w-16 h-28 lg:h-16 m-auto'>
+                  <img
+                     src={pocion.imagen.secure_url}
+                     alt={pocion.nombre}
+                     className='object-cover w-28 lg:w-16 h-28 lg:h-16 rounded-full'
+                  />
+               </div>
+               <p className='col-span-2 max-lg:row-start-2 lg:col-span-2 font-bold text-2xl lg:text-xl'>
+                  {pocion.nombre}
+               </p>
+               <p className='col-span-2 max-lg:row-span-2 lg:col-span-5 font-semibold md:text-xl lg:text-lg'>{pocion.descripcion}</p>
+               <p className='col-span-1 max-lg:row-start-5 lg:col-span-1 font-semibold md:text-xl lg:text-lg'>{`${pocion.precio}$`}</p>
+               <p className='col-span-1 max-lg:row-start-5 lg:col-end-11 font-semibold md:text-xl lg:text-lg'>{pocion.cantidad}</p>
 
                <Tooltip
                   title='Editar Pocion'
                   TransitionComponent={Zoom}
                   placement='bottom'
                >
-                  <IconButton
+                  <p
                      color='inherit'
                      aria-label='add an alarm'
-                     className='font-medium col-end-12 flex justify-center'
+                     className='font-medium col-span-1 max-lg:row-start-6 lg:col-end-12 flex justify-center'
                      onClick={() => handleModalEdit(pocion)}
                   >
                      <FiEdit3 className='text-3xl' />
-                  </IconButton>
+                  </p>
                </Tooltip>
                <Tooltip
                   title='Editar Pocion'
                   TransitionComponent={Zoom}
                   placement='bottom'
                >
-                  <IconButton
+                  <p
                      color='inherit'
                      aria-label='add an alarm'
-                     className='font-medium col-end-13 flex justify-center'
+                     className='font-medium col-span-1 max-lg:row-start-6 lg:col-end-13 flex justify-center'
                      onClick={() => handleModalDelete(pocion._id)}
                   >
                      <BsFillTrashFill className='text-3xl' />
-                  </IconButton>
+                  </p>
                </Tooltip>
-            </ListItem>
+            </li>
          ))}
 
          {modalDelete === true && (
@@ -94,7 +72,7 @@ export default function Listofpotions({ handlePotions, pociones, handleModalEdit
                id={potionID}
             />
          )}
-      </List>
+      </ul>
    )
 }
 
@@ -105,7 +83,11 @@ export function NoPotions() {
 export function Pociones({ handlePotions, pociones, handleModalEdit }) {
    const hasPotions = pociones.length > 0
    return hasPotions ? (
-      <Listofpotions handlePotions={handlePotions} pociones={pociones} handleModalEdit={handleModalEdit}/>
+      <Listofpotions
+         handlePotions={handlePotions}
+         pociones={pociones}
+         handleModalEdit={handleModalEdit}
+      />
    ) : (
       <NoPotions pociones={pociones} />
    )
