@@ -32,7 +32,7 @@ export default function Listofingredients({ ingredientes }) {
 }
 
 export function NoIngredients() {
-   return <div>Ha ocurrido unn Error</div>
+   return <div>Ha ocurrido un Error</div>
 }
 
 export function Ingredientes({ ingredientes }) {
